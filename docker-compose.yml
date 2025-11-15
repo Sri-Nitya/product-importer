@@ -30,7 +30,8 @@ services:
       - redis
       - postgres
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres
+      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/postgres"
+      REDIS_URL: "redis://redis:6379/0"
 
   worker:
     build: .
@@ -42,7 +43,8 @@ services:
       - redis
       - postgres
     environment:
-      - PYTHONUNBUFFERED=1
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres
+      PYTHONUNBUFFERED: 1
+      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/postgres"
+      REDIS_URL: "redis://redis:6379/0"
 volumes:
   postgres-data:
