@@ -84,3 +84,9 @@ def delete_product(product_id: int):
     db.commit()
     return {"id": product_id}
 
+@router.delete("/")
+def bulk_delete():
+    db = SessionLocal()
+    deleted = db.query(Product).delete()
+    db.commit()
+    return {"detail": f"Deleted {deleted} products"}
