@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Product Importer</title>
+    <title>Product Importer - Upload CSV</title>
     <style>
         #progress-container {
             width: 100%;
@@ -18,6 +18,9 @@
             color: white;
             border-radius: 5px;
         }
+        button {
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -30,6 +33,8 @@
     </div>
 
     <p id="status"></p>
+
+    <button onclick="goToProducts()">Manage Products</button>
 
     <script>
         let fileId = null;
@@ -57,7 +62,6 @@
             fileId = result.file_id;
             document.getElementById("status").innerText = "File uploaded. Processing...";
 
-            // Poll progress
             progressInterval = setInterval(checkProgress, 1000);
         }
 
@@ -77,6 +81,10 @@
                 document.getElementById("status").innerText = 
                     result.status === "completed" ? "Import completed!" : "Import failed.";
             }
+        }
+
+        function goToProducts() {
+            window.location.href = "/static/products.html";
         }
     </script>
 </body>
