@@ -1,0 +1,30 @@
+version: '3.9'
+
+services:
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  api:
+    build: .
+    container_name: fastapi_app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+
+  worker:
+    build: .
+    container_name: celery_worker
+    command: celery -A app.tasks.celery_app.celery_app worker --loglevel=DEBUG -Q product_importer_queue
+    volumes:
+      - .:/code
+    depends_on:
+      - redis
+    environment:
+      - PYTHONUNBUFFERED=1
