@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Importer</title>
+    <style>
+        #progress-container {
+            width: 100%;
+            background-color: #eee;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        #progress-bar {
+            width: 0%;
+            height: 20px;
+            background-color: #4caf50;
+            text-align: center;
+            color: white;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Upload CSV File</h2>
+    <input type="file" id="file-input" accept=".csv">
+    <button onclick="uploadFile()">Upload</button>
+
+    <div id="progress-container">
+        <div id="progress-bar">0%</div>
+    </div>
+
+    <p id="status"></p>
+
+    <script>
+        let fileId = null;
+        let progressInterval = null;
+
+        async function uploadFile() {
+            const fileInput = document.getElementById("file-input");
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert("Please select a CSV file.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            document.getElementById("status").innerText = "Uploading...";
+            const response = await fetch("/upload/", {
+                method: "POST",
+                body: formData
+            });
+
+            const result = await response.json();
+            fileId = result.file_id;
+            document.getElementById("status").innerText = "File uploaded. Processing...";
+
+            // Poll progress
+            progressInterval = setInterval(checkProgress, 1000);
+        }
+
+        async function checkProgress() {
+            if (!fileId) return;
+
+            const response = await fetch(`/upload/progress/${fileId}`);
+            const result = await response.json();
+
+            const progress = result.progress;
+            const progressBar = document.getElementById("progress-bar");
+            progressBar.style.width = progress + "%";
+            progressBar.innerText = progress + "%";
+
+            if (result.status === "completed" || result.status === "failed") {
+                clearInterval(progressInterval);
+                document.getElementById("status").innerText = 
+                    result.status === "completed" ? "Import completed!" : "Import failed.";
+            }
+        }
+    </script>
+</body>
+</html>
